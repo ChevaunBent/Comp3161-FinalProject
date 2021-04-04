@@ -12,5 +12,11 @@ set DATABASE_URL=mysql://username:pasword@host/databasename
 
 2. Start mysql server and create a database called finalproject
 
-3.run python module run.py in terminal
+3. Create a virtual environment (python3 -m venv venv)
+
+4. Activate the virtual environment(source/venv/bin/activate)
+
+5. Pip install requirements (pip install -r requirements.txt)
+
+6.run python module run.py in terminal (python3 run.py)
 
