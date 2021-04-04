@@ -1,0 +1,16 @@
+1.Set the following environment variables using terminal:
+SECRET_KEY=$3CR3TK3Y
+DATABASE_URL=mysql://root:rootpassword@127.0.0.1/finalproject
+
+Mac: 
+export SECRET_KEY=S3CR#TK3Y
+export DATABASE_URL=mysql://root:rootpassword@127.0.0.1/finalproject
+
+Windows:
+set SECRET_KEY=$3CR3TK3Y
+set DATABASE_URL=mysql://username:pasword@host/databasename
+
+2. Start mysql server and create a database called finalproject
+
+3.run python module run.py in terminal
+

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block main %}
+  <div class="login-form center-block">
+    <h2>Create New User</h2>
+    {% include 'flash_messages.html' %}
+    <form action="{{ url_for('register') }}" method="post">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        {{ form.firstname.label }}
+        {{ form.firstname(class='form-control', placeholder="Enter your First Name") }}
+      </div>
+      <div class="form-group">
+        {{ form.lastname.label }}
+        {{ form.lastname(class='form-control', placeholder = "Enter your Last Name") }}
+      </div>      
+      <div class="form-group">
+        {{ form.age.label }}
+        {{ form.age(class='form-control', placeholder="Enter your Age") }}
+      </div>
+      <div class="form-group">
+        {{ form.email.label }}
+        {{ form.email(class='form-control', placeholder="Enter your Age") }}
+      </div>      
+      <div class="form-group">
+        {{ form.telephone.label }}
+        {{ form.telephone(class='form-control', placeholder="(xxx)xxx-xxxx") }}
+      </div>     
+      <div class="form-group">
+        {{ form.preference.label }}
+        {{ form.preference }}
+      </div>     
+      <div class="form-group">
+        {{ form.username.label }}
+        {{ form.username(class='form-control', placeholder="Enter your Username") }}
+      </div>
+      <div class="form-group">
+        {{ form.password.label }}
+        {{ form.password(class='form-control') }}
+      </div>
+      <div class="form-group">
+        {{ form.confirm.label }}
+        {{ form.confirm(class='form-control') }}
+      </div>
+      <button type="submit" name="submit" class="btn btn-primary btn-block">Add User</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %} View All Recipes {% endblock %}
+{% block main %}
+{% include 'flash_messages.html' %}
+<h1>Recipess</h1>
+{% if recipes|length > 0 %}
+    <div class="recipeimage">
+        {% for prop in recipes %}
+        <div class="group">
+            <div class = "img">
+                <img src="{{ url_for('get_image', filename = prop[3]) }}"/>
+            </div>
+
+            <div class="info">
+                <span class="title">{{ prop[1]}}</span>
+                <span class="ins"> {{prop[2]}}</span>
+                <br/>
+                <a href="{{ url_for('get_recipe', recipeid = prop[0]) }}" class="link">
+                    <span class="view">View Recipe</span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+        <br/>
+    </div>
+{% else %}
+    <div class ="recipemessage">
+        <h4>No Recipes Uploaded yet. Upload a Recipe to start viewing</h4>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}
