@@ -111,7 +111,7 @@ def login():
                 if sha256_crypt.verify(password, passwrd):
                     #If credentials match, create a sesstion and log in 
                     session['username']=list(usernamedata)
-                    session['userid']=int(useriddata)
+                    session['userid']=list(useriddata)
                     #Indicate to user that they have logged in
                     flash("You are now logged in!", "success")
                     #redirects user to a secured page that can only be accessed after loggin in
