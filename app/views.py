@@ -99,7 +99,6 @@ def login():
         passworddata = db.execute("SELECT password FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
         pw = passworddata[0]
-        print("Password is ",pw)
         useriddata = db.execute("SELECT userid FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
         #Processing results of query
