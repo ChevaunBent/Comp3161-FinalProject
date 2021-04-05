@@ -98,6 +98,8 @@ def login():
                                   "username": username}).fetchone()
         passworddata = db.execute("SELECT password FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
+        pw = passworddata[0]
+        print("Password is ",pw)
         useriddata = db.execute("SELECT userid FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
         #Processing results of query
@@ -107,23 +109,22 @@ def login():
             return render_template('login.html', form = form)
         else:
             #If username exists, check password entered agaianst password stored in database for that user
-            for passwrd in passworddata:
-                if sha256_crypt.verify(password, passwrd):
-                    #If credentials match, create a sesstion and log in 
-                    session['username']=list(usernamedata)
-                    session['userid']=list(useriddata)
-                    #Indicate to user that they have logged in
-                    flash("You are now logged in!", "success")
-                    #redirects user to a secured page that can only be accessed after loggin in
-                    #Only for demonstration Purposes
-                    return redirect(url_for('secured'))
-                else:
-                    #if Credentials are incorrect, promt user to try entering again
-                    flash("Incorrect password entered please try again", "danger")
-                    return render_template('login.html', form = form)
+            if sha256_crypt.verify(password, pw):
+                #If credentials match, create a sesstion and log in 
+                session['username']=list(usernamedata)
+                session['userid']=list(useriddata)
+                #Indicate to user that they have logged in
+                flash("You are now logged in!", "success")
+                #redirects user to a secured page that can only be accessed after loggin in
+                #Only for demonstration Purposes
+                return redirect(url_for('secured'))
+            else:
+                #if Credentials are incorrect, promt user to try entering again
+                flash("Incorrect password entered please try again", "danger")
+                return render_template('login.html', form = form)
         #In the event authication fails completely for unknown reason to user, ask them to try again
         flash("An Error Occured please try logging in again, if error persists, contact administrator", "danger")
-    return render_template('login.html', form = form)    
+    return render_template('login.html', form = form)
 
 #Route used for logging a user out of the
 @app.route("/logout")
