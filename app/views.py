@@ -36,6 +36,7 @@ def register_logged():
 #Used to add a new user to the system
 @app.route("/register", methods=['POST', 'GET'])
 def register():
+    #session.pop('csrf_token', None)
     # Instantiate form class
     userform = CreateUser()
     #Validates form data
@@ -50,7 +51,7 @@ def register():
         username = userform.username.data
         password = userform.password.data
         confirm = userform.confirm.data
-        secure_password = sha256_crypt.hash(str('password'))
+        secure_password = sha256_crypt.hash(str(password))
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         #Query Server database using database object
@@ -91,12 +92,12 @@ def register():
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     #instantiate LoginForm
-    form = LoginForm()
+    logform = LoginForm()
     #Validates form data
-    if request.method == "POST" and form.validate_on_submit():
+    if request.method == "POST" and logform.validate_on_submit():
         #Gets data from form
-        username = form.username.data
-        password = form.password.data
+        username = logform.username.data
+        password = logform.password.data
         #Creates a database object by binding the connection created earlier at startup
         db = scoped_session(sessionmaker(bind=conn))
         #Querying the server using database object
@@ -110,7 +111,7 @@ def login():
         if usernamedata is None:
             #Informs user no such user exists
             flash("No such user exists", "danger")
-            return render_template('login.html', form = form)
+            return render_template('login.html', form = logform)
         else:
             pw = passworddata[0]
             usr = usernamedata[0]
@@ -128,10 +129,10 @@ def login():
             else:
                 #if Credentials are incorrect, promt user to try entering again
                 flash("Incorrect password entered please try again", "danger")
-                return render_template('login.html', form = form)
+                return render_template('login.html', form = logform)
         #In the event authication fails completely for unknown reason to user, ask them to try again
         flash("An Error Occured please try logging in again, if error persists, contact administrator", "danger")
-    return render_template('login.html', form = form)    
+    return render_template('login.html', form = logform)    
 
 #Route used for logging a user out of the
 @app.route("/logout")
@@ -139,6 +140,7 @@ def logout():
     #Remove active session
     session.pop('username', None)
     session.pop('userid', None)
+    session.pop('csrf_token', None)
     session.clear()
     #Notify Log out and redirect to home page
     flash("You have been succcessfully logged out", "success")  
