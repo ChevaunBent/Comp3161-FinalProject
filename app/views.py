@@ -110,7 +110,7 @@ def login():
             return render_template('login.html', form = form)
         else:
             #If username exists, check password entered agaianst password stored in database for that user
-            if sha256_crypt.verify(password, pw):
+            for passwrd in pw:
                 #If credentials match, create a sesstion and log in 
                 session['username']=list(usr)
                 session['userid']=int(usrid)
