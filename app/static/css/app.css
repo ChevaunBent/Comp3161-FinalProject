@@ -40,3 +40,7 @@ body {
     padding: 5px;
     width: 100%;
 }
+
+#navbarSupportedContent:hover{
+    color: rgb(14, 103, 245);
+}

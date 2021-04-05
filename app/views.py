@@ -44,7 +44,7 @@ def register():
         username = userform.username.data
         password = userform.password.data
         confirm = userform.confirm.data
-        secure_password = sha256_crypt.encrypt(str('password'))
+        secure_password = sha256_crypt.hash(str('password'))
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         #Query Server database using database object
@@ -112,7 +112,7 @@ def login():
             #If username exists, check password entered agaianst password stored in database for that user
             if sha256_crypt.verify(password,pw):
                 #If credentials match, create a sesstion and log in 
-                session['username']=list(usr)
+                session['username']=str(usr)
                 session['userid']=int(usrid)
                 #Indicate to user that they have logged in
                 flash("You are now logged in!", "success")
