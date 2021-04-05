@@ -27,6 +27,12 @@ with conn.connect() as con:
 # Routing for application.
 ###
 
+#If a user is logged in already they wont be allowed to register
+@app.route("/register_logged")
+def register_logged():
+    return redirect(url_for('login'))
+
+
 #Used to add a new user to the system
 @app.route("/register", methods=['POST', 'GET'])
 def register():
@@ -100,15 +106,15 @@ def login():
                                   "username": username}).fetchone()
         useriddata = db.execute("SELECT userid FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
-        pw = passworddata[0]
-        usr = usernamedata[0]
-        usrid = useriddata[0]
         #Processing results of query
-        if usr is None:
+        if usernamedata is None:
             #Informs user no such user exists
             flash("No such user exists", "danger")
             return render_template('login.html', form = form)
         else:
+            pw = passworddata[0]
+            usr = usernamedata[0]
+            usrid = useriddata[0]
             #If username exists, check password entered agaianst password stored in database for that user
             if sha256_crypt.verify(password,pw):
                 #If credentials match, create a sesstion and log in 

@@ -41,6 +41,25 @@ body {
     width: 100%;
 }
 
-#navbarSupportedContent:hover{
-    color: rgb(14, 103, 245);
+.logmessage{
+    font-family: 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+    margin-top: 10px;
+    padding: 5px;
+    color: rgb(48, 195, 198);
+    background-color: white;
+    text-align: center;
+}
+
+.formdivcont{
+    justify-self: center;
+    align-items: center;
+    align-content: center;
+    background-color: white;
+    padding: 10px;
+    margin: auto;
+    max-width: 75%;
+}
+
+.frm{
+    padding: 10px;
 }

@@ -1,50 +1,53 @@
 {% extends "base.html" %} {% block main %}
-<div class="login-form center-block">
-    <h2>Create New User</h2>
-    {% include 'flash_messages.html' %}
-    <form action="{{ url_for('register') }}" method="post">
-        {{ form.csrf_token }}
-        <div class="d-flex">
+<div class="formdivcont">
+    <div class="login-form center-block"></div>
+        <h2>Create New User</h2>
+        {% include 'flash_messages.html' %}
+        <form class="frm" action="{{ url_for('register') }}" method="post">
+            {{ form.csrf_token }}
+            <div class="d-flex">
+                <div class="form-group col-6 pl-0">
+                    <h5>{{ form.firstname.label }}</h5>
+                    {{ form.firstname(class='form-control', placeholder="Enter your First Name") }}
+                </div>
+                <div class="form-group col-6 px-0">
+                    <h5>{{ form.lastname.label }}</h5>
+                    {{ form.lastname(class='form-control', placeholder = "Enter your Last Name") }}
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="form-group col-6 pl-0">
+                    <h5>{{ form.age.label }}</h5>
+                    {{ form.age(class='form-control', placeholder="Enter your Age") }}
+                </div>
+                <div class="form-group col-6 px-0">
+                    <h5>{{ form.telephone.label }}</h5>
+                    {{ form.telephone(class='form-control', placeholder="(xxx) xxx-xxxx") }}
+                </div>
+            </div>
             <div class="form-group col-6 pl-0">
-                <h5>{{ form.firstname.label }}</h5>
-                {{ form.firstname(class='form-control', placeholder="Enter your First Name") }}
+                <h5>{{ form.email.label }}</h5>
+                {{ form.email(class='form-control', placeholder="Enter your Email") }}
             </div>
-            <div class="form-group col-6 px-0">
-                <h5>{{ form.lastname.label }}</h5>
-                {{ form.lastname(class='form-control', placeholder = "Enter your Last Name") }}
+            <div class="form-group">
+                <h5>{{ form.preference.label }}</h5>
+                {{ form.preference(class='btn btn-primary') }}
             </div>
-        </div>
-        <div class="d-flex">
-            <div class="form-group col-6 pl-0">
-                <h5>{{ form.age.label }}</h5>
-                {{ form.age(class='form-control', placeholder="Enter your Age") }}
+            <div class="form-group">
+                <h5>{{ form.username.label }}</h5>
+                {{ form.username(class='form-control', placeholder="Enter your Username") }}
             </div>
-            <div class="form-group col-6 px-0">
-                <h5>{{ form.telephone.label }}</h5>
-                {{ form.telephone(class='form-control', placeholder="(xxx) xxx-xxxx") }}
+            <div class="form-group">
+                <h5>{{ form.password.label }}</h5>
+                {{ form.password(class='form-control') }}
             </div>
-        </div>
-        <div class="form-group col-6 pl-0">
-            <h5>{{ form.email.label }}</h5>
-            {{ form.email(class='form-control', placeholder="Enter your Email") }}
-        </div>
-        <div class="form-group">
-            <h5>{{ form.preference.label }}</h5>
-            {{ form.preference(class='btn btn-primary') }}
-        </div>
-        <div class="form-group">
-            <h5>{{ form.username.label }}</h5>
-            {{ form.username(class='form-control', placeholder="Enter your Username") }}
-        </div>
-        <div class="form-group">
-            <h5>{{ form.password.label }}</h5>
-            {{ form.password(class='form-control') }}
-        </div>
-        <div class="form-group">
-            <h5>{{ form.confirm.label }}</h5>
-            {{ form.confirm(class='form-control') }}
-        </div>
-        <button type="submit" name="submit" class="btn btn-primary">Add User</button>
-    </form>
+            <div class="form-group">
+                <h5>{{ form.confirm.label }}</h5>
+                {{ form.confirm(class='form-control') }}
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Add User</button>
+        </form>
+    </div>
 </div>
+
 {% endblock %}
