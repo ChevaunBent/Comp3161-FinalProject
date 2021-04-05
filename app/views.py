@@ -98,11 +98,13 @@ def login():
                                   "username": username}).fetchone()
         passworddata = db.execute("SELECT password FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
-        pw = passworddata[0]
         useriddata = db.execute("SELECT userid FROM users WHERE username=:username", {
                                   "username": username}).fetchone()
+        pw = passworddata[0]
+        usr = usernamedata[0]
+        usrid = useriddata[0]
         #Processing results of query
-        if usernamedata is None:
+        if usr is None:
             #Informs user no such user exists
             flash("No such user exists", "danger")
             return render_template('login.html', form = form)
@@ -110,8 +112,8 @@ def login():
             #If username exists, check password entered agaianst password stored in database for that user
             if sha256_crypt.verify(password, pw):
                 #If credentials match, create a sesstion and log in 
-                session['username']=list(usernamedata)
-                session['userid']=list(useriddata)
+                session['username']=list(usr)
+                session['userid']=int(usrid)
                 #Indicate to user that they have logged in
                 flash("You are now logged in!", "success")
                 #redirects user to a secured page that can only be accessed after loggin in
@@ -123,7 +125,7 @@ def login():
                 return render_template('login.html', form = form)
         #In the event authication fails completely for unknown reason to user, ask them to try again
         flash("An Error Occured please try logging in again, if error persists, contact administrator", "danger")
-    return render_template('login.html', form = form)
+    return render_template('login.html', form = form)    
 
 #Route used for logging a user out of the
 @app.route("/logout")
