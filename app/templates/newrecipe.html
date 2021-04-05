@@ -1,27 +1,23 @@
-{% extends "base.html" %}
-{% block main %}
-  {% if 'username' in session %}
-    <div class="login-form center-block">
-      <h2>Please fill in Recipe information</h2>
-      {% include 'flash_messages.html' %}
-      <form action="{{ url_for('addrecipe') }}" method="post" enctype="multipart/form-data">
+{% extends "base.html" %} {% block main %} {% if 'username' in session %}
+<div class="login-form center-block">
+    <h2>Please fill in Recipe information</h2>
+    {% include 'flash_messages.html' %}
+    <form action="{{ url_for('addrecipe') }}" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}
-        <div class="form-group">
-          {{ form.title.label }}
-          {{ form.title(class='form-control', placeholder="Enter Recipe Title") }}
+        <div class="form-group col-sm-9 pl-0">
+            {{ form.title.label }} {{ form.title(class='form-control', placeholder="Enter Recipe Title") }}
+        </div>
+        <div class="form-group col-sm-9 pl-0">
+            {{ form.instructions.label }} {{ form.instructions(class='form-control', placeholder = "Enter Instructions") }}
         </div>
         <div class="form-group">
-          {{ form.instructions.label }}
-          {{ form.instructions(class='form-control', placeholder = "Enter your Last Name") }}
-        </div>      
-        <div class="form-group">
-          {{ form.upload.label }}
-          {{ form.upload(class='form-control') }}
+            <div class="col-sm-5 pl-0">
+                {{ form.upload.label }} {{ form.upload(class='form-control') }}
+            </div>
         </div>
-        <button type="submit" name="submit" class="btn btn-primary btn-block">Add Recipe</button>
-      </form>
-    </div>
-  {% else %}
-    <h1>You need to be logged in to Add Recipes</h1>
-  {% endif %}
-{% endblock %}
+        <button type="submit" name="submit" class="btn btn-primary ">Add Recipe</button>
+    </form>
+</div>
+{% else %}
+<h1>You need to be logged in to Add Recipes</h1>
+{% endif %} {% endblock %}

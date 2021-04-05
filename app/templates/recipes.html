@@ -1,24 +1,26 @@
 {% extends "base.html" %} {% block title %} View All Recipes {% endblock %} {% block main %} {% include 'flash_messages.html' %}
 <h1>Recipes</h1>
 {% if recipes|length > 0 %}
-<div class="recipeimage">
+<div class="card-deck">
     {% for prop in recipes %}
-    <div class="group">
-        <div class="img">
-            <img src="{{ url_for('get_image', filename = prop[3]) }}" />
+    <div class="card mb-4" style="min-width: 18rem; max-width: 22rem;">
+        <div class="card-img-top">
+            <img class="image" src="{{ url_for('get_image', filename = prop[3]) }}" />
         </div>
 
-        <div class="info">
-            <span class="title">{{ prop[1]}}</span>
-            <span class="ins"> {{prop[2]}}</span>
+        <div class="card-body">
+            <h6 class="title pb-2">{{ prop[1]}}</h6>
+            <br>
+            <h6 class="pb-2"> {{prop[2]}}</h6>
+
             <br/>
             <a href="{{ url_for('get_recipe', recipeid = prop[0]) }}" class="link">
-                <span class="view">View Recipe</span>
+                <button class='btn btn-primary text-white font-sml font-weight-bold view_recipe_button' type="button">View Recipe</button>
             </a>
         </div>
+        <br/>
     </div>
     {% endfor %}
-    <br/>
 </div>
 {% else %}
 <div class="recipemessage">

@@ -1,24 +1,20 @@
-{% extends "base.html" %}
-{% block title %} View Recipe {% endblock %}
-{% block main %}
-{% include 'flash_messages.html' %}
+{% extends "base.html" %} {% include 'flash_messages.html' %} {% block main %}
+<h4 class="text-center">{% block title %} View Recipe {% endblock %} </h4>
 {% if recipe != null %}
-    <div class="singlerecipeimage">
-        <div class = "singleimg">
-            <img src="{{ url_for('get_image', filename = recipe[3]) }}"/>
-        </div>
-        <div class="singleinfo">
-            <span class="singletitle"><h3>{{ recipe[1]}}</h3></span>
-            <span class="singlecdate"><b>Recipe Added On: </b>PUT DATE HERE USING QUERIES</span><br>
-            <span class="singleins"><b>Instruction: </b>{{ recipe[2] }}</span>
-        </div>
+<div class="card mx-auto" style="width: 28rem;">
+    <div class="card-img-top">
+        <img class="singleimg" src="{{ url_for('get_image', filename = recipe[3]) }}" />
     </div>
-        <br/>
+    <div class="card-body">
+        <span class="singletitle"><h3>{{ recipe[1]}}</h3></span>
+        <span class="singlecdate"><b>Recipe Added On: </b>PUT DATE HERE USING QUERIES</span><br>
+        <span class="singleins"><b>Instruction: </b>{{ recipe[2] }}</span>
+    </div>
+    <br/>
+</div>
 {% else %}
-    <div class ="singlerecipemessage">
-        <p>No Recipe Selected. Select a recipe to start viewing</p>
-    </div>
+<div class="singlerecipemessage">
+    <p>No Recipe Selected. Select a recipe to start viewing</p>
+</div>
 
-{% endif %}
-
-{% endblock %}
+{% endif %} {% endblock %}
