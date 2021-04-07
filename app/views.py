@@ -8,7 +8,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from passlib.hash import sha256_crypt
 from werkzeug.utils import secure_filename
 from app import app
-from app.forms import LoginForm, CreateUser, UploadForm
+from app.forms import LoginForm, CreateUser, UploadForm, NewMeal
 import pandas as pd
 from faker import Faker
 
@@ -230,10 +230,59 @@ def recipes():
         response.headers['Content-Type'] = 'application/json'            
         return response
 
-@app.route('/meal')
+#Route for displaying all meals
+@app.route('/meals/', methods=["GET", "POST"])
+def meals():
+    #Creates a database object by binding the connection created earlier
+    db = scoped_session(sessionmaker(bind=conn))
+    #Queries the database using database object for all recipes
+    res = db.execute("SELECT * FROM meal").fetchall()
+    meals = list(res)
+    #Handles our GET request
+    if request.method == "GET":
+        """Render the website's meals page."""
+        return render_template('meals.html', meals = meals)
+    #Handles our POST request despite there should not be a post request for this route
+    elif request.method == "POST":
+        response = make_response(jsonify(meals))                                           
+        response.headers['Content-Type'] = 'application/json'            
+        return response
+
+@app.route('/meal', methods=['POST', 'GET'])
 def meal():
-    """Render the website's about page."""
-    return render_template('dummy.html')
+    # Instantiate form class
+    mealform = NewMeal()
+    #Validates form data
+    if request.method == "POST" and mealform.validate_on_submit:
+        #Gets data from form
+        name = mealform.name.data
+        #Gets session data on the current logged in user
+        '''username = str(session['username'])'''
+        UID = str(session['userid'])
+
+        #Generate mealID and receive date created from Adds Table
+        MID = genId("meal")
+
+        #Creates a database object by binding the connection created earlier
+        db = scoped_session(sessionmaker(bind=conn))
+        if UID != None:
+            try:
+                db.execute("INSERT INTO meal(meal_id,name)VALUES(:meal_id,:name)",{"meal_id":MID,"name": name})
+                db.commit()
+                flash("Meal Added Successfully", "success")
+                return redirect(url_for('meals'))
+            except Exception as error:
+                flash("Failed to update record to database, rollback done, try adding again", "danger")
+                print("Failed to update record to database, rollback done: {}".format(error))
+                # reverting changes if exception occurs
+                db.rollback()
+            finally:
+                # closing created database object .
+                if conn:
+                    db.remove()
+    #If form validation fails, errors are displayed on form 
+    flash_errors(mealform)
+    return render_template('newmeal.html', form = mealform)
 
 # Used to generate a file's url for display
 @app.route("/uploads/<filename>")

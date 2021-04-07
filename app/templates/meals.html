@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block title %} View All Meals {% endblock %} {% block main %} {% include 'flash_messages.html' %}
+<h1>Meals</h1>
+{% if meals != None%}
+<div class="card-deck">
+    {% for prop in meals %}
+    <div class="card mb-4" style="min-width: 18rem; max-width: 22rem;">
+
+        <div class="card-body">
+            <span class="title">{{ prop[1]}}</span>
+        </div>
+        <br/>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="recipemessage">
+    <h4>No Meals Uploaded yet. Upload a Meal to start viewing</h4>
+
+</div>
+
+{% endif %} {% endblock %}

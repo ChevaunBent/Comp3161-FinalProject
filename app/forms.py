@@ -38,3 +38,7 @@ class UploadForm(FlaskForm):
     instructions = StringField('Instructions, ', validators=[InputRequired(),Length(min=1, max=400)])
     upload = FileField('Photo', validators=[FileRequired(),FileAllowed(['jpg', 'jpeg', 'png'], 
     'PLease select an Image!')])
+    
+class NewMeal(FlaskForm):
+    name = StringField('Meal Title', validators=[InputRequired(),Length(min=1, max=50)])
+    

@@ -2,10 +2,11 @@
 <div class="login-form center-block">
     <h2>Meal Plan</h2>
     {% include 'flash_messages.html' %}
-    <form action="{{ url_for('addrecipe') }}" method="POST">
+    <form action="{{ url_for('meal') }}" method="POST">
         <div class="form-group col-sm-9 pl-0">
-            <p>To be implemented</p>
+            {{ form.name.label }} {{ form.name(class='form-control', placeholder="Enter Meal Title") }}
         </div>
+        <button type="submit" name="submit" class="btn btn-primary ">Add Meal</button>
     </form>
 </div>
 {% else %}
