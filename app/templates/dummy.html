@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block main %} {% if 'username' in session %}
+<div class="login-form center-block">
+    <h2>Meal Plan</h2>
+    {% include 'flash_messages.html' %}
+    <form action="{{ url_for('addrecipe') }}" method="POST">
+        <div class="form-group col-sm-9 pl-0">
+            <p>To be implemented</p>
+        </div>
+    </form>
+</div>
+{% else %}
+<h1>You need to be logged in to Add Recipes</h1>
+{% endif %} {% endblock %}

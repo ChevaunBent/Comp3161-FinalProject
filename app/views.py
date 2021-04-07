@@ -200,13 +200,13 @@ def home():
     """Render website's home page."""
     return render_template('home.html')
 
-#Route used to display about page
+#Route used to display secured page
 @app.route('/secured/')
 def secured():
     """Render the website's about page."""
     return render_template('secured.html')
 
-#Route used to display secured page
+#Route used to display about page
 @app.route('/about/')
 def about():
     """Render the website's about page."""
@@ -229,6 +229,11 @@ def recipes():
         response = make_response(jsonify(recipes))                                           
         response.headers['Content-Type'] = 'application/json'            
         return response
+
+@app.route('/meal')
+def meal():
+    """Render the website's about page."""
+    return render_template('dummy.html')
 
 # Used to generate a file's url for display
 @app.route("/uploads/<filename>")
