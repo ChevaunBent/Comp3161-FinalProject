@@ -161,7 +161,68 @@ def addrecipe():
     if request.method == "POST" and userform.validate_on_submit():
         #Gets data from form
         name = userform.name.data
-        servings = userform.servings.data
+        serving = userform.serving.data
+        nutrition_no = userform.nutrition_no.data
+        calories = userform.calories.data
+        total_fat = userform.total_fat.data
+        sugar = userform.sugar.data
+        sodium = userform.sodium.data
+        protein = userform.protein.data
+        saturated_fat = userform.saturated_fat.data
+        """ title = userform.title.data
+        instructions = userform.instructions.data"""
+        # Get Photo of recipe and save to uploads folder
+        userfile = request.files['upload']
+        filename = secure_filename(userfile.filename)
+        userfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        #Gets session data on the current logged in user
+        '''username = str(session['username'])'''
+        '''UID = (session['userid'])'''
+
+        #Generate recipeID and receive date created from Adds Table
+        """ RID = genId(title, filename) """
+        RID = genId(name, filename)
+        #Creates a database object by binding the connection created earlier
+        db = scoped_session(sessionmaker(bind=conn))
+        if session:
+            try:
+                db.execute(("INSERT INTO recipe(recipe_id,name,serving,nutrition_no)VALUES(:recipe_id,:name,:serving,:nutrition_no)",
+                       {"recipe_id":RID,"name": name,"serving": serving, "nutrition_no" : nutrition_no}), ("INSERT INTO nutrition(nutrition_no,calories,total_fat,sugar,sodium,protein,saturated_fat)VALUES(:nutrition_no,calories,total_fat,sugar,sodium,protein,saturated_fat)",
+                                                                              {"nutrition_no" : nutrition_no, "calories" : calories, "total_fat" : total_fat, "sugar" : sugar, "sodium" : sodium, "protein" : protein, 
+                                                                               "saturated_fat" : saturated_fat}))
+                
+                """ db.execute("INSERT INTO recipes(recipeid,title,instructions,filename)VALUES(:recipeid,:title,:instructions,:filename)",
+                       {"recipeid":RID,"title": title,"instructions": instructions, "filename":filename}) """
+                
+                db.commit()
+                '''Adds(UID, RID)'''
+                Adds(RID)
+                flash("Recipe Added Successfully", "success")
+                return redirect(url_for('recipes'))
+            except Exception as error:
+                flash("Failed to update record to database, rollback done, try adding again", "danger")
+                print("Failed to update record to database, rollback done: {}".format(error))
+                # reverting changes if exception occurs
+                db.rollback()
+            finally:
+                # closing created database object .
+                if conn:
+                    db.remove()
+    #If form validation fails, errors are displayed on form 
+    flash_errors(userform)
+    return render_template('newrecipe.html', form = userform)
+
+
+#Route used for adding a meal
+@app.route("/addmeal", methods=['POST', 'GET'])
+def addmeal():
+    # Instantiate form class
+    userform = UploadForm()
+    #Validates form data
+    if request.method == "POST" and userform.validate_on_submit():
+        #Gets data from form
+        name = userform.name.data
+        serving = userform.serving.data
         nutrition_no = userform.nutrition_no.data
         """ title = userform.title.data
         instructions = userform.instructions.data
@@ -180,8 +241,9 @@ def addrecipe():
         db = scoped_session(sessionmaker(bind=conn))
         if UID != None:
             try:
-                db.execute("INSERT INTO recipe(recipe_id,name,servings,nutrition_no)VALUES(:recipe_id,:name,:servings,:nutrition_no)",
-                       {"recipe_id":RID,"name": name,"servings": servings, "nutrition_no":nutrition_no})
+                db.execute("INSERT INTO recipe(recipe_id,name,serving,nutrition_no)VALUES(:recipe_id,:name,:serving,:nutrition_no)",
+                       {"recipe_id":RID,"name": name,"serving": serving, "nutrition_no":nutrition_no})
+                
                 """ db.execute("INSERT INTO recipes(recipeid,title,instructions,filename)VALUES(:recipeid,:title,:instructions,:filename)",
                        {"recipeid":RID,"title": title,"instructions": instructions, "filename":filename}) """
                 db.commit()
@@ -199,7 +261,7 @@ def addrecipe():
                     db.remove()
     #If form validation fails, errors are displayed on form 
     flash_errors(userform)
-    return render_template('newrecipe.html', form = userform)
+    return render_template('newmeal.html', form = userform)
 
 #Route used for displaying home page
 @app.route('/')

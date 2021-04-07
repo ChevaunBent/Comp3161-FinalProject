@@ -1,22 +1,46 @@
-{% extends "base.html" %} {% block main %} {% if 'username' in session %}
+{% extends "base.html" %} {% block main %} {% if session %}
 <div class="login-form center-block">
     <h2>Please fill in Recipe information</h2>
     {% include 'flash_messages.html' %}
     <form action="{{ url_for('addrecipe') }}" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}
-        <div class="form-group col-sm-9 pl-0">
+        <div class="form-group">
             {{ form.name.label }} {{ form.name(class='form-control', placeholder="Enter Recipe Title") }}
         </div>
-        <div class="form-group col-sm-9 pl-0">
-            {{ form.servings.label }} {{ form.servings(class='form-control', style='min-height: 43px; height: 150px;', placeholder = "Enter Instructions") }}
-        </div>
-        <div class="form-group col-sm-9 pl-0">
-            {{ form.nutrition_no.label }} {{ form.nutrition_no(class='form-control', style='min-height: 43px; height: 150px;', placeholder = "Enter Instructions") }}
-        </div>
-        <div class="form-group">
-            <div class="col-sm-5 pl-0">
-                {{ form.upload.label }} {{ form.upload(class='form-control') }}
+        <div class="d-flex">
+            <div class="form-group col-6 pl-0">
+                {{ form.serving.label }} {{ form.serving(class='form-control', placeholder = "Number of Servings") }}
             </div>
+            <div class="form-group col-6 pl-0">
+                {{ form.nutrition_no.label }} {{ form.nutrition_no(class='form-control', placeholder = "Nutrition Number") }}
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class="form-group col-6 pl-0">
+                {{ form.calories.label }} {{ form.calories(class='form-control', placeholder = "Calories") }}
+            </div>
+            <div class="form-group col-6 pl-0">
+                {{ form.total_fat.label }} {{ form.total_fat(class='form-control', placeholder = "Total Fat") }}
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class="form-group col-6 pl-0">
+                {{ form.sugar.label }} {{ form.sugar(class='form-control', placeholder = "Sugar") }}
+            </div>
+            <div class="form-group col-6 pl-0">
+                {{ form.sodium.label }} {{ form.sodium(class='form-control', placeholder = "Sodium") }}
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class="form-group col-6 pl-0">
+                {{ form.protein.label }} {{ form.protein(class='form-control', placeholder = "Proteins") }}
+            </div>
+            <div class="form-group col-6 pl-0">
+                {{ form.saturated_fat.label }} {{ form.saturated_fat(class='form-control', placeholder = "Number of Saturated Fat") }}
+            </div>
+        </div>
+        <div class="form-group col-6 pl-0">
+            {{ form.upload.label }} {{ form.upload(class='form-control') }}
         </div>
         <button type="submit" name="submit" class="btn btn-primary ">Add Recipe</button>
     </form>
