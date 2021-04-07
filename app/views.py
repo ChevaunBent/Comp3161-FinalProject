@@ -16,13 +16,6 @@ from faker import Faker
 # Sets up connections to database using database settings stored in environment variable
 conn = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
-#Generates Tables from sql file
-with conn.connect() as con:
-    file = open('app/static/SQL/sqlfile.sql')
-    query = text(file.read())
-    con.execute(query)
-    con.close()
-
 ###
 # Routing for application.
 ###
@@ -40,43 +33,28 @@ def register():
     # Instantiate form class
     userform = CreateUser()
     #Validates form data
-    if request.method == "POST" and userform.validate_on_submit():
+    if request.method == "POST" :
         #Gets data from form
         firstname = userform.firstname.data
         lastname = userform.lastname.data
         age = userform.age.data
         height = userform.height.data
         weight = userform.weight.data
-        '''email = userform.email.data
-        telephone = userform.telephone.data
-        preference = userform.preference.data
-        username = userform.username.data'''
         password = userform.password.data
         confirm = userform.confirm.data
         secure_password = sha256_crypt.hash(str(password))
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
-        #Query Server database using database object
-        '''usernamedata = db.execute("SELECT username FROM users WHERE username=:username", {
-                                  "username": username}).fetchone()'''
-        #Generates a random user ID to be used in database
-        'userid = genId(firstname, lastname)'
-        PID = genId(firstname, lastname)
+        #Generate personID
+        PID = genId("person")
         #Process Results from database
-        '''if usernamedata != None: 
-            flash("Username already taken please try another username","danger")
-            return render_template('register.html', form = userform)'''
-        #If username is not in database then create user using data entered in form
-        if password == confirm: #usernamedata == None and 
+        if password == confirm: 
             #Database Transaction Management
             try:
                 db.execute("INSERT INTO person(person_id,first_name,last_name,age,height,weight,password)VALUES(:person_id,:first_name,:last_name,:age,:height,:weight,:password)",
                            {"person_id":PID,"first_name": firstname, "last_name": lastname, "age":age, "height":height, "weight":weight, "password": secure_password})
-                
-                '''db.execute("INSERT INTO users(userid,firstname,lastname,age,email,telephone,preference,username,password)VALUES(:userid,:firstname,:lastname,:age,:email,:telephone,:preference,:username,:password)",
-                           {"userid":userid,"firstname": firstname, "lastname": lastname, "age":age, "email":email, "telephone": telephone, "preference": preference, "username": username, "password": secure_password})'''
                 db.commit()
-                flash("Registration Successful", "success")
+                flash("Registration Successful Please login", "success")
                 return redirect(url_for('login'))
             except Exception as error:
                 flash("Failed to update record to database, rollback done, try adding again" "danger")
@@ -104,15 +82,24 @@ def login():
         #Gets data from form
         username = logform.username.data
         password = logform.password.data
+        #seperates username to get ID
+        try:
+            #Handles possible exception from bad username input
+            txt = username.split('_')
+            user= txt[0]
+            userid = int(txt[1])
+        except Exception as error:
+                flash("Incorrect Username Format, try logging in again. Format: FirstName_ID", "danger")
+                return render_template('login.html', form = logform)
         #Creates a database object by binding the connection created earlier at startup
         db = scoped_session(sessionmaker(bind=conn))
         #Querying the server using database object
-        usernamedata = db.execute("SELECT username FROM users WHERE username=:username", {
-                                  "username": username}).fetchone()
-        passworddata = db.execute("SELECT password FROM users WHERE username=:username", {
-                                  "username": username}).fetchone()
-        useriddata = db.execute("SELECT userid FROM users WHERE username=:username", {
-                                  "username": username}).fetchone()
+        usernamedata = db.execute("SELECT first_name FROM person WHERE person_id=:person_id", {
+                                  "person_id": userid}).fetchone()
+        passworddata = db.execute("SELECT password FROM person WHERE person_id=:person_id", {
+                                  "person_id": userid}).fetchone()
+        useriddata = db.execute("SELECT person_id FROM person WHERE person_id=:person_id", {
+                                  "person_id": userid}).fetchone()
         #Processing results of query
         if usernamedata is None:
             #Informs user no such user exists
@@ -158,10 +145,10 @@ def addrecipe():
     # Instantiate form class
     userform = UploadForm()
     #Validates form data
-    if request.method == "POST" and userform.validate_on_submit():
+    if request.method == "POST" and userform.validate_on_submit:
         #Gets data from form
         name = userform.name.data
-        serving = userform.serving.data
+        serving = userform.servings.data
         nutrition_no = userform.nutrition_no.data
         calories = userform.calories.data
         total_fat = userform.total_fat.data
@@ -169,34 +156,29 @@ def addrecipe():
         sodium = userform.sodium.data
         protein = userform.protein.data
         saturated_fat = userform.saturated_fat.data
-        """ title = userform.title.data
-        instructions = userform.instructions.data"""
+        instructions = userform.instructions.data
+        #Gets session data on the current logged in user
+        '''username = str(session['username'])'''
+        UID = str(session['userid'])
+
+        #Generate recipeID and receive date created from Adds Table
+        RID = genId("recipe")
+        imgID = str(RID)
+
         # Get Photo of recipe and save to uploads folder
         userfile = request.files['upload']
         filename = secure_filename(userfile.filename)
-        userfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        #Gets session data on the current logged in user
-        '''username = str(session['username'])'''
-        '''UID = (session['userid'])'''
+        userfile.save(os.path.join(app.config['UPLOAD_FOLDER'], imgID))
 
-        #Generate recipeID and receive date created from Adds Table
-        """ RID = genId(title, filename) """
-        RID = genId(name, filename)
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
-        if session:
+        if UID != None:
             try:
-                db.execute(("INSERT INTO recipe(recipe_id,name,serving,nutrition_no)VALUES(:recipe_id,:name,:serving,:nutrition_no)",
-                       {"recipe_id":RID,"name": name,"serving": serving, "nutrition_no" : nutrition_no}), ("INSERT INTO nutrition(nutrition_no,calories,total_fat,sugar,sodium,protein,saturated_fat)VALUES(:nutrition_no,calories,total_fat,sugar,sodium,protein,saturated_fat)",
-                                                                              {"nutrition_no" : nutrition_no, "calories" : calories, "total_fat" : total_fat, "sugar" : sugar, "sodium" : sodium, "protein" : protein, 
-                                                                               "saturated_fat" : saturated_fat}))
-                
-                """ db.execute("INSERT INTO recipes(recipeid,title,instructions,filename)VALUES(:recipeid,:title,:instructions,:filename)",
-                       {"recipeid":RID,"title": title,"instructions": instructions, "filename":filename}) """
-                
+                db.execute("INSERT INTO nutrition(nutrition_no,calories,total_fat,sugar,sodium,protein,saturated_fat)VALUES(:nutrition_no,:calories,:total_fat,:sugar,:sodium,:protein,:saturated_fat)",
+                       {"nutrition_no":nutrition_no,"calories": calories,"total_fat": total_fat, "sugar":sugar,"sodium":sodium,"protein":protein,"saturated_fat":saturated_fat})
+                db.execute("INSERT INTO recipe(recipe_id,name,serving,nutrition_no)VALUES(:recipe_id,:name,:serving,:nutrition_no)",
+                       {"recipe_id":RID,"name": name,"serving": serving, "nutrition_no":nutrition_no})
                 db.commit()
-                '''Adds(UID, RID)'''
-                Adds(RID)
                 flash("Recipe Added Successfully", "success")
                 return redirect(url_for('recipes'))
             except Exception as error:
@@ -211,57 +193,6 @@ def addrecipe():
     #If form validation fails, errors are displayed on form 
     flash_errors(userform)
     return render_template('newrecipe.html', form = userform)
-
-
-#Route used for adding a meal
-@app.route("/addmeal", methods=['POST', 'GET'])
-def addmeal():
-    # Instantiate form class
-    userform = UploadForm()
-    #Validates form data
-    if request.method == "POST" and userform.validate_on_submit():
-        #Gets data from form
-        name = userform.name.data
-        serving = userform.serving.data
-        nutrition_no = userform.nutrition_no.data
-        """ title = userform.title.data
-        instructions = userform.instructions.data
-         """# Get Photo of recipe and save to uploads folder
-        userfile = request.files['upload']
-        filename = secure_filename(userfile.filename)
-        userfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        #Gets session data on the current logged in user
-        '''username = str(session['username'])'''
-        UID = (session['userid'])
-
-        #Generate recipeID and receive date created from Adds Table
-        """ RID = genId(title, filename) """
-        RID = genId(name, filename)
-        #Creates a database object by binding the connection created earlier
-        db = scoped_session(sessionmaker(bind=conn))
-        if UID != None:
-            try:
-                db.execute("INSERT INTO recipe(recipe_id,name,serving,nutrition_no)VALUES(:recipe_id,:name,:serving,:nutrition_no)",
-                       {"recipe_id":RID,"name": name,"serving": serving, "nutrition_no":nutrition_no})
-                
-                """ db.execute("INSERT INTO recipes(recipeid,title,instructions,filename)VALUES(:recipeid,:title,:instructions,:filename)",
-                       {"recipeid":RID,"title": title,"instructions": instructions, "filename":filename}) """
-                db.commit()
-                Adds(UID, RID)
-                flash("Recipe Added Successfully", "success")
-                return redirect(url_for('recipes'))
-            except Exception as error:
-                flash("Failed to update record to database, rollback done, try adding again" "danger")
-                print("Failed to update record to database, rollback done: {}".format(error))
-                # reverting changes if exception occurs
-                db.rollback()
-            finally:
-                # closing created database object .
-                if conn:
-                    db.remove()
-    #If form validation fails, errors are displayed on form 
-    flash_errors(userform)
-    return render_template('newmeal.html', form = userform)
 
 #Route used for displaying home page
 @app.route('/')
@@ -287,7 +218,8 @@ def recipes():
     #Creates a database object by binding the connection created earlier
     db = scoped_session(sessionmaker(bind=conn))
     #Queries the database using database object for all recipes
-    recipes = db.execute("SELECT * FROM recipes").fetchall()
+    res = db.execute("SELECT * FROM recipe").fetchall()
+    recipes = list(res)
     #Handles our GET request
     if request.method == "GET":
         """Render the website's recipes page."""
@@ -306,13 +238,13 @@ def get_image(filename):
                                filename)
 
 #Route for finding and displaying a specific recipe that was selected
-@app.route('/recipe/<recipeid>', methods=["GET", "POST"])
-def get_recipe(recipeid):
+@app.route('/recipe/<recipe_id>', methods=["GET", "POST"])
+def get_recipe(recipe_id):
     #Get a specific recipe in the database using the recipe ID that was generated on insertion
     db = scoped_session(sessionmaker(bind=conn))
     #Queries the database using database object for all recipes
-    recipe = db.execute("SELECT * FROM recipes WHERE recipeid=:recipeid", {
-                                  "recipeid": recipeid}).fetchone()
+    recipe = db.execute("SELECT * FROM recipe WHERE recipe_id=:recipe_id", {
+                                  "recipe_id": recipe_id}).fetchone()
     #Handles our Get request to fetch a recipe that mathces the recipe ID
     if request.method == "GET":
         return render_template("viewrecipe.html", recipe=recipe)
@@ -329,7 +261,19 @@ def get_recipe(recipeid):
             flash('Recipe Not Found', 'danger')
             return redirect(url_for("recipes"))
 
+#Generates the next ID to assign on manual input from the front end
+def genId(table):
+    #Get a specific recipe in the database using the recipe ID that was generated on insertion
+    db = scoped_session(sessionmaker(bind=conn))
+    #Queries the database using database object for all recipes
+    currentcount = db.execute("SELECT COUNT(*) FROM "+ table)
+    userid = list(currentcount)[0][0] + 1
+    return int(userid)
 
+     
+
+"""
+#No longer using
 # Generates a unique 5 digit ID for each entry in our database
 def genId(title, filename):
     id = []
@@ -340,6 +284,7 @@ def genId(title, filename):
     random.shuffle(id)
     res = ''.join(id)
     return int(res[:5])
+"""
 
 #Helper function that populates Adds table and get a date created value
 def Adds(UID,RID):
