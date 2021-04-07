@@ -9,8 +9,9 @@
         </div>
 
         <div class="card-body">
-            <span class="title">{{ prop[1]}}</span>
-            <span class="ins"> {{prop[2]}}</span>
+            <span class="title"> <b> Name </b>: {{ prop[1]}}</span><br>
+            <span class="ins"> <b> Serving </b>: {{prop[2]}}</span><br>
+            <span class="ins"> <b> Nutrition Number</b>: {{prop[3]}}</span><br>
             <br/>
             <a href="{{ url_for('get_recipe', recipe_id = prop[0]) }}" class="link">
                 <button class='btn btn-primary text-white font-sml font-weight-bold view_recipe_button' type="button">View Recipe</button>
