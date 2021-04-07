@@ -45,32 +45,38 @@ def register():
         firstname = userform.firstname.data
         lastname = userform.lastname.data
         age = userform.age.data
-        email = userform.email.data
+        height = userform.height.data
+        weight = userform.weight.data
+        '''email = userform.email.data
         telephone = userform.telephone.data
         preference = userform.preference.data
-        username = userform.username.data
+        username = userform.username.data'''
         password = userform.password.data
         confirm = userform.confirm.data
         secure_password = sha256_crypt.hash(str(password))
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         #Query Server database using database object
-        usernamedata = db.execute("SELECT username FROM users WHERE username=:username", {
-                                  "username": username}).fetchone()
+        '''usernamedata = db.execute("SELECT username FROM users WHERE username=:username", {
+                                  "username": username}).fetchone()'''
         #Generates a random user ID to be used in database
-        userid = genId(firstname, lastname)
+        'userid = genId(firstname, lastname)'
+        PID = genId(firstname, lastname)
         #Process Results from database
-        if usernamedata != None: 
+        '''if usernamedata != None: 
             flash("Username already taken please try another username","danger")
-            return render_template('register.html', form = userform)
+            return render_template('register.html', form = userform)'''
         #If username is not in database then create user using data entered in form
-        if usernamedata == None and password == confirm:
+        if password == confirm: #usernamedata == None and 
             #Database Transaction Management
             try:
-                db.execute("INSERT INTO users(userid,firstname,lastname,age,email,telephone,preference,username,password)VALUES(:userid,:firstname,:lastname,:age,:email,:telephone,:preference,:username,:password)",
-                           {"userid":userid,"firstname": firstname, "lastname": lastname, "age":age, "email":email, "telephone": telephone, "preference": preference, "username": username, "password": secure_password})
+                db.execute("INSERT INTO person(person_id,first_name,last_name,age,height,weight,password)VALUES(:person_id,:first_name,:last_name,:age,:height,:weight,:password)",
+                           {"person_id":PID,"first_name": firstname, "last_name": lastname, "age":age, "height":height, "weight":weight, "password": secure_password})
+                
+                '''db.execute("INSERT INTO users(userid,firstname,lastname,age,email,telephone,preference,username,password)VALUES(:userid,:firstname,:lastname,:age,:email,:telephone,:preference,:username,:password)",
+                           {"userid":userid,"firstname": firstname, "lastname": lastname, "age":age, "email":email, "telephone": telephone, "preference": preference, "username": username, "password": secure_password})'''
                 db.commit()
-                flash("registration successful", "success")
+                flash("Registration Successful", "success")
                 return redirect(url_for('login'))
             except Exception as error:
                 flash("Failed to update record to database, rollback done, try adding again" "danger")
@@ -154,24 +160,30 @@ def addrecipe():
     #Validates form data
     if request.method == "POST" and userform.validate_on_submit():
         #Gets data from form
-        title = userform.title.data
+        name = userform.name.data
+        servings = userform.servings.data
+        nutrition_no = userform.nutrition_no.data
+        """ title = userform.title.data
         instructions = userform.instructions.data
-        # Get Photo of recipe and save to uploads folder
+         """# Get Photo of recipe and save to uploads folder
         userfile = request.files['upload']
         filename = secure_filename(userfile.filename)
         userfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         #Gets session data on the current logged in user
-        username = str(session['username'])
+        '''username = str(session['username'])'''
         UID = (session['userid'])
 
         #Generate recipeID and receive date created from Adds Table
-        RID = genId(title, filename)
+        """ RID = genId(title, filename) """
+        RID = genId(name, filename)
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         if UID != None:
             try:
-                db.execute("INSERT INTO recipes(recipeid,title,instructions,filename)VALUES(:recipeid,:title,:instructions,:filename)",
-                       {"recipeid":RID,"title": title,"instructions": instructions, "filename":filename})
+                db.execute("INSERT INTO recipe(recipe_id,name,servings,nutrition_no)VALUES(:recipe_id,:name,:servings,:nutrition_no)",
+                       {"recipe_id":RID,"name": name,"servings": servings, "nutrition_no":nutrition_no})
+                """ db.execute("INSERT INTO recipes(recipeid,title,instructions,filename)VALUES(:recipeid,:title,:instructions,:filename)",
+                       {"recipeid":RID,"title": title,"instructions": instructions, "filename":filename}) """
                 db.commit()
                 Adds(UID, RID)
                 flash("Recipe Added Successfully", "success")
