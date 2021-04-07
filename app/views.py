@@ -179,7 +179,9 @@ def addrecipe():
                 db.execute("INSERT INTO recipe(recipe_id,name,serving,nutrition_no)VALUES(:recipe_id,:name,:serving,:nutrition_no)",
                        {"recipe_id":RID,"name": name,"serving": serving, "nutrition_no":nutrition_no})
                 db.commit()
+                dir = direction(RID, instructions)
                 flash("Recipe Added Successfully", "success")
+                print("Directions added successfully")
                 return redirect(url_for('recipes'))
             except Exception as error:
                 flash("Failed to update record to database, rollback done, try adding again", "danger")
@@ -296,12 +298,17 @@ def get_image(filename):
 def get_recipe(recipe_id):
     #Get a specific recipe in the database using the recipe ID that was generated on insertion
     db = scoped_session(sessionmaker(bind=conn))
+    instrucdata = list(db.execute("SELECT detail from direction WHERE recipe_id=:recipe_id", {
+                                  "recipe_id": recipe_id}).fetchall())
     #Queries the database using database object for all recipes
-    recipe = db.execute("SELECT * FROM recipe WHERE recipe_id=:recipe_id", {
-                                  "recipe_id": recipe_id}).fetchone()
+    recipe = list(db.execute("SELECT * from recipe WHERE recipe_id=:recipe_id",{"recipe_id":recipe_id}).fetchone())
+    
+    res = list(recipe) + [instrucdata]
+
+
     #Handles our Get request to fetch a recipe that mathces the recipe ID
     if request.method == "GET":
-        return render_template("viewrecipe.html", recipe=recipe)
+        return render_template("viewrecipe.html", recipe=res)
     
     #Handles a POST request for in the event a POST request is generated despite this should not happen
     elif request.method == "POST":
@@ -324,7 +331,28 @@ def genId(table):
     userid = list(currentcount)[0][0] + 1
     return int(userid)
 
-     
+#Adds the instructions to the direction table
+def direction(RID, Inst):
+    #Get a specific recipe in the database using the recipe ID that was generated on insertion
+    db = scoped_session(sessionmaker(bind=conn))
+    instructions = Inst.split(',')
+    dir_no = 1
+    for ins in instructions:
+        try:
+            db.execute("INSERT INTO direction(recipe_id,dir_no,detail)VALUES(:recipe_id,:dir_no,:detail)",
+                    {"recipe_id":RID,"dir_no": dir_no,"detail": ins})
+            db.commit()
+            dir_no +=1
+        except Exception as error:
+            flash("Failed to update record to database, rollback done, try adding again", "danger")
+            print("Failed to update record to database, rollback done: {}".format(error))
+            # reverting changes if exception occurs
+            db.rollback()
+        finally:
+            # closing created database object .
+            if conn:
+                db.remove()
+    return True
 
 """
 #No longer using

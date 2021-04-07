@@ -7,8 +7,14 @@
     </div>
     <div class="card-body">
         <span class="singletitle"><h3>{{ recipe[1]}}</h3></span>
-        <span class="singleins"><b>Servings: </b>{{ recipe[2] }}</span> <br>
-        <span class="singlecdate"><b>Instructions: </b> To be implemented</span><br>
+        <span class="singleins"><b>Servings: </b>{{ recipe[2] }}</span><br>
+        <span class="singlecdate"><b>Instructions: 
+        <ul>
+            {% for ins in recipe[4] %}
+                <li>{{ins[0]}}</li>
+            {%endfor%}
+    </ul>
+
     </div>
     <br/>
 </div>
