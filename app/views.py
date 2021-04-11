@@ -44,7 +44,7 @@ def register():
         username = userform.username.data
         password = userform.password.data
         confirm = userform.confirm.data
-        secure_password = sha256_crypt.hash(str(password))
+        secure_password = sha256_crypt.hash(password)
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         #Generate personID
@@ -111,6 +111,7 @@ def login():
             pw = passworddata[0]
             usr = usernamedata[0]
             usrid = useriddata[0]
+            
             #If username exists, check password entered agaianst password stored in database for that user
             if sha256_crypt.verify(password,pw):
                 #If credentials match, create a sesstion and log in 
@@ -218,7 +219,7 @@ def about():
 
 #Route for displaying all recipes
 @app.route('/recipes/', methods=["GET", "POST"])
-def recipes():
+def recipes():    
     #Instantiate search form
     searchform = search()
     #Creates a database object by binding the connection created earlier
@@ -236,7 +237,6 @@ def recipes():
         response = make_response(jsonify(recipes))                                           
         response.headers['Content-Type'] = 'application/json'            
         return response
-
 #Route for searching a recipe
 @app.route('/searchrecipe', methods=["GET", "POST"])
 def searchrecipe():
@@ -299,6 +299,7 @@ def meal():
         #Gets data from form
         name = mealform.name.data
         #Gets session data on the current logged in user
+        '''username = str(session['username'])'''
         UID = str(session['userid'])
         #Generate mealID 
         MID = genId("meal")
