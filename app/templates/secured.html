@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block main %} {% if 'username' in session %} {% include 'flash_messages.html' %}
-<h3>You are viewing a secured page that can only be accessed by logging in</h3>
+<h3 class="pt-3">You are viewing a secured page that can only be accessed by logging in</h3>
 {% else %}
 <h3>You need to be logged in to view this page</h3>
 {% endif %} {% endblock %}
