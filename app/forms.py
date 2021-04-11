@@ -32,7 +32,7 @@ class UploadForm(FlaskForm):
     sodium = IntegerField('Sodium', validators=[InputRequired(), Regexp("^\d+$")])
     protein = IntegerField('Protein', validators=[InputRequired(), Regexp("^\d+$")])
     saturated_fat = IntegerField('Saturated Fat', validators=[InputRequired(), Regexp("^\d+$")])
-    instructions = StringField('Instructions, ', validators=[InputRequired(),Length(min=1, max=400)])
+    instructions = StringField('Instructions', validators=[InputRequired(),Length(min=1, max=400)])
     upload = FileField('Photo', validators=[FileRequired(),FileAllowed(['jpg', 'jpeg', 'png'], 
     'PLease select an Image!')])
     
