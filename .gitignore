@@ -17,3 +17,5 @@ venv/
 .vscode
 
 app/static/uploads/
+
+sqlfile.sql
