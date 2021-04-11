@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, TextAreaField, IntegerField
-from wtforms.validators import InputRequired, Regexp, Length
+from wtforms.validators import InputRequired, Regexp, Length, Optional
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 
@@ -24,18 +24,22 @@ class UploadForm(FlaskForm):
     instructions = TextAreaField('Instructions', validators=[InputRequired(),Length(min=1, max=250)])
     '''
     name = StringField('Recipe Title', validators=[InputRequired(),Length(min=1, max=50)])
-    servings = IntegerField('Servings', validators=[InputRequired()])
-    nutrition_no = IntegerField('Nutrition Number', validators=[InputRequired()])
-    calories = IntegerField('Calories', validators=[InputRequired()])
-    total_fat = IntegerField('Total Fat', validators=[InputRequired()])
-    sugar = IntegerField('Sugar', validators=[InputRequired()])
-    sodium = IntegerField('Sodium', validators=[InputRequired()])
-    protein = IntegerField('Protein', validators=[InputRequired()])
-    saturated_fat = IntegerField('Saturated Fat', validators=[InputRequired()])
+    servings = IntegerField('Servings', validators=[InputRequired(), Regexp("^\d+$")])
+    nutrition_no = IntegerField('Nutrition Number', validators=[InputRequired(), Regexp("^\d+$")])
+    calories = IntegerField('Calories', validators=[InputRequired(), Regexp("^\d+$")])
+    total_fat = IntegerField('Total Fat', validators=[InputRequired(), Regexp("^\d+$")])
+    sugar = IntegerField('Sugar', validators=[InputRequired(), Regexp("^\d+$")])
+    sodium = IntegerField('Sodium', validators=[InputRequired(), Regexp("^\d+$")])
+    protein = IntegerField('Protein', validators=[InputRequired(), Regexp("^\d+$")])
+    saturated_fat = IntegerField('Saturated Fat', validators=[InputRequired(), Regexp("^\d+$")])
     instructions = StringField('Instructions, ', validators=[InputRequired(),Length(min=1, max=400)])
     upload = FileField('Photo', validators=[FileRequired(),FileAllowed(['jpg', 'jpeg', 'png'], 
     'PLease select an Image!')])
     
 class NewMeal(FlaskForm):
     name = StringField('Meal Title', validators=[InputRequired(),Length(min=1, max=50)])
+
+class search(FlaskForm):
+    name = StringField('Search by Recipe Title', validators=[Optional(strip_whitespace=True)])
+    serving = IntegerField('Search by Servings', validators=[Optional(strip_whitespace=True), Regexp("^\d+$")])
     

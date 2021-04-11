@@ -8,7 +8,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from passlib.hash import sha256_crypt
 from werkzeug.utils import secure_filename
 from app import app
-from app.forms import LoginForm, CreateUser, UploadForm, NewMeal
+from app.forms import LoginForm, CreateUser, UploadForm, NewMeal, search
 import pandas as pd
 from faker import Faker
 
@@ -57,16 +57,17 @@ def register():
             if password == confirm: 
                 #Database Transaction Management
                 try:
-                    db.execute("INSERT INTO person(person_id,first_name,last_name,age,height,weight,email,username,password)VALUES(:person_id,:first_name,:last_name,:age,:height,:weight,:email,:username:password)",
+                    db.execute("INSERT INTO person(person_id,first_name,last_name,age,height,weight,email,username,password)VALUES(:person_id,:first_name,:last_name,:age,:height,:weight,:email,:username,:password)",
                             {"person_id":PID,"first_name": firstname, "last_name": lastname, "age":age, "height":height, "weight":weight, "email":email, "username":username, "password": secure_password})
                     db.commit()
                     flash("Registration Successful Please login", "success")
                     return redirect(url_for('login'))
                 except Exception as error:
-                    flash("Failed to update record to database, rollback done, try adding again" "danger")
+                    flash("Failed to update record to database, rollback done, try adding again", "danger")
                     print("Failed to update record to database, rollback done: {}".format(error))
                     # reverting changes if exception occurs
                     db.rollback()
+                    return render_template('register.html', form = userform)
                 finally:
                     # closing created database object .
                     if conn:
@@ -96,8 +97,8 @@ def login():
         #Querying the server using database object
         usernamedata = db.execute("SELECT username FROM person WHERE username=:username", {
                                   "username": username}).fetchone()
-        passworddata = db.execute("SELECT password FROM person WHERE password=:password", {
-                                  "password": password}).fetchone()
+        passworddata = db.execute("SELECT password FROM person WHERE username=:username", {
+                                  "username": username}).fetchone()
         useriddata = db.execute("SELECT person_id FROM person WHERE username=:username", {
                                   "username": username}).fetchone()
         #Processing results of query
@@ -218,20 +219,58 @@ def about():
 #Route for displaying all recipes
 @app.route('/recipes/', methods=["GET", "POST"])
 def recipes():
+    #Instantiate search form
+    searchform = search()
     #Creates a database object by binding the connection created earlier
     db = scoped_session(sessionmaker(bind=conn))
-    #Queries the database using database object for all recipes
-    res = db.execute("SELECT * FROM recipe").fetchall()
+    #Queries the database using database object for 90 recipes
+    # (Restricted for Demo Purposes as 600k records all at once will result in possible timeout)
+    res = db.execute("SELECT * FROM recipe LIMIT 0,30")
     recipes = list(res)
     #Handles our GET request
     if request.method == "GET":
         """Render the website's recipes page."""
-        return render_template('recipes.html', recipes = recipes)
+        return render_template('recipes.html', recipes = recipes, form = searchform)
     #Handles our POST request despite there should not be a post request for this route
     elif request.method == "POST":
         response = make_response(jsonify(recipes))                                           
         response.headers['Content-Type'] = 'application/json'            
         return response
+
+#Route for searching a recipe
+@app.route('/searchrecipe', methods=["GET", "POST"])
+def searchrecipe():
+    #Instantiate search form
+    searchform = search()
+    #Validates form data
+    if request.method == "POST" and searchform.validate_on_submit:
+        #Get specific recipes in the database using the filter entered
+        filter1 = searchform.name.data
+        filter2 = searchform.serving.data
+        #Creates a database object by binding the connection created earlier
+        db = scoped_session(sessionmaker(bind=conn))
+        if len(filter1) == 0 and filter2 == None:
+            results = db.execute("SELECT * FROM recipe LIMIT 0,30")
+            return render_template('recipes.html', recipes = results, form = searchform)
+        elif len(filter1) != 0 and filter2 == None:
+            #Query Database using filter1
+            results = list(db.execute("SELECT * from recipe WHERE name=:name LIMIT 0,30", {
+                                  "name": filter1}).fetchall())
+            return render_template('recipes.html', recipes = results, form = searchform)
+        elif len(filter1) != 0  and filter2 != None:
+            #Query Database using filter2
+            result1 = list(db.execute("SELECT * from recipe WHERE name=:name LIMIT 0,30", {
+                                  "name": filter1}).fetchall())
+            result2 = list(db.execute("SELECT * from recipe WHERE serving=:serving LIMIT 0,30", {
+                                  "serving": filter2}).fetchall())
+            results = result1 + result2
+            return render_template('recipes.html', recipes = result1, form = searchform)
+        flash("No results matching query", "danger")
+        return render_template('recipes.html', form = searchform)
+        
+    #If form validation fails, errors are displayed on form 
+    flash_errors(searchform)
+    return render_template('recipes.html', form = searchform)
 
 #Route for displaying all meals
 @app.route('/meals/', methods=["GET", "POST"])
@@ -260,7 +299,6 @@ def meal():
         #Gets data from form
         name = mealform.name.data
         #Gets session data on the current logged in user
-        '''username = str(session['username'])'''
         UID = str(session['userid'])
         #Generate mealID 
         MID = genId("meal")

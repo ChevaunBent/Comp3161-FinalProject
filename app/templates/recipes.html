@@ -1,6 +1,22 @@
-{% extends "base.html" %} {% block title %} View All Recipes {% endblock %} {% block main %} {% include 'flash_messages.html' %}
-<h1>Recipes</h1>
+{% extends "base.html" %} 
+{% block title %} View All Recipes {% endblock %} 
+{% block main %} 
+{% include 'flash_messages.html' %}
+<h3>Search Recipes</h3>
 {% if recipes != None%}
+    <form class="frm" action="{{ url_for('searchrecipe') }}" method="post">
+        {{ form.csrf_token }}
+        <div class="form-group col-6 pl-0">
+            <h5>{{ form.name.label }}</h5>
+            {{ form.name(class='form-control', placeholder="Enter Name of recipe") }}
+        </div>
+        <div class="form-group col-6 pl-0">
+            <h5>{{ form.serving.label }}</h5>
+            {{ form.serving(class='form-control', placeholder="Enter Servings of recipe") }}
+        </div>
+        <button type="submit" name="submit" class="btn btn-primary m-auto">Search Recipe</button><br>
+    </form>
+    <br><span><h2>View Recipes</h2></span><br>
 <div class="card-deck">
     {% for prop in recipes %}
     <div class="card mb-4" style="min-width: 18rem; max-width: 22rem;">

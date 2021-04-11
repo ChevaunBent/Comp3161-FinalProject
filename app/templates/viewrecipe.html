@@ -3,7 +3,7 @@
 {% if recipe != null %}
 <div class="card mx-auto" style="width: 28rem;">
     <div class="card-img-top">
-        <img class="singleimg" src="{{ url_for('get_image', filename = recipe[0]) }}" />
+        <img class="singleimg" src="{{ url_for('get_image', filename = recipe[0]) }}", alt="Image Unavailable" />
     </div>
     <div class="card-body">
         <span class="singletitle"><h3>{{ recipe[1]}}</h3></span>
