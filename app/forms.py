@@ -14,11 +14,8 @@ class CreateUser(FlaskForm):
     age = IntegerField('Age', validators=[InputRequired(), Regexp("^\d+$")])
     height = StringField('Height', validators=[InputRequired()])
     weight = IntegerField('Weight', validators=[InputRequired()])
-
-    '''email = StringField('Email Address', validators=[InputRequired(), Regexp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")])
-    telephone = StringField('Telephone', validators=[InputRequired(), Regexp("^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$")])
-    preference = SelectField(label='Meal Type', choices=[("Gain Weight", "Gain Weight"), ("Lose Weight", "Lose Weight")])
-    username = StringField('Username', validators=[InputRequired()])'''
+    email = StringField('Email Address', validators=[InputRequired(), Regexp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")])
+    username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()]) 
     confirm = PasswordField('Retype Password', validators=[InputRequired()])
 

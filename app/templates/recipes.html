@@ -5,7 +5,7 @@
     {% for prop in recipes %}
     <div class="card mb-4" style="min-width: 18rem; max-width: 22rem;">
         <div class="card-img-top">
-            <img class="image" src="{{ url_for('get_image', filename = prop[0]) }}" />
+            <img class="image" src="{{ url_for('get_image', filename = prop[0]) }}" alt="Image Unavailable"/>
         </div>
 
         <div class="card-body">

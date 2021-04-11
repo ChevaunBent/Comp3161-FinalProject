@@ -1,20 +1,20 @@
 1.Set the following environment variables using terminal:
 SECRET_KEY=$3CR3TK3Y
-DATABASE_URL=mysql://root:rootpassword@127.0.0.1/
+DATABASE_URL=mysql://username:password@host/finalproject
 
 Mac: 
-export SECRET_KEY=S3CR#TK3Y
-export DATABASE_URL=mysql://root:rootpassword@127.0.0.1/mealSystemDBS
+export SECRET_KEY=$3CR3TK3Y
+export DATABASE_URL=mysql://username:password@host/finalproject
 
 Windows:
 set SECRET_KEY=$3CR3TK3Y
-set DATABASE_URL=mysql://username:pasword@host/databasename
+set DATABASE_URL=mysql://username:pasword@host/finalproject
 
 2. Start mysql server;
 
 3. Create a virtual environment (python3 -m venv venv)
 
-4. Activate the virtual environment(source/venv/bin/activate)
+4. Activate the virtual environment(source venv/bin/activate)
 
 5. Pip install requirements (pip install -r requirements.txt)
 

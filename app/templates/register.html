@@ -31,7 +31,14 @@
                 <h5>{{ form.weight.label }}</h5>
                 {{ form.weight(class='form-control', placeholder="Enter your Weight") }}
             </div>
-            <p class="mt-5">lb&#39;s</p>
+            <div class="form-group col-6 pl-0">
+                <h5>{{ form.email.label }}</h5>
+                {{ form.email(class='form-control', placeholder="Enter your email address") }}
+            </div>
+            <div class="form-group col-6 pl-0">
+                <h5>{{ form.username.label }}</h5>
+                {{ form.username(class='form-control', placeholder="Enter a Username") }}
+            </div>
         </div>
         <div class="form-group col-6 pl-0">
             <h5>{{ form.password.label }}</h5>

@@ -40,6 +40,8 @@ def register():
         age = userform.age.data
         height = userform.height.data
         weight = userform.weight.data
+        email = userform.email.data
+        username = userform.username.data
         password = userform.password.data
         confirm = userform.confirm.data
         secure_password = sha256_crypt.hash(str(password))
@@ -47,26 +49,33 @@ def register():
         db = scoped_session(sessionmaker(bind=conn))
         #Generate personID
         PID = genId("person")
-        #Process Results from database
-        if password == confirm: 
-            #Database Transaction Management
-            try:
-                db.execute("INSERT INTO person(person_id,first_name,last_name,age,height,weight,password)VALUES(:person_id,:first_name,:last_name,:age,:height,:weight,:password)",
-                           {"person_id":PID,"first_name": firstname, "last_name": lastname, "age":age, "height":height, "weight":weight, "password": secure_password})
-                db.commit()
-                flash("Registration Successful Please login", "success")
-                return redirect(url_for('login'))
-            except Exception as error:
-                flash("Failed to update record to database, rollback done, try adding again" "danger")
-                print("Failed to update record to database, rollback done: {}".format(error))
-                # reverting changes if exception occurs
-                db.rollback()
-            finally:
-                # closing created database object .
-                if conn:
-                    db.remove()
-        #if password and conform password field doesnt match an error is displayed
-        flash("Password and confirm password do not match","danger")
+        #Check database if username already taken
+        usernamedata = db.execute("SELECT username FROM person WHERE username=:username", {
+                                  "username": username}).fetchone()
+        if usernamedata == None:
+            #Process Results from database
+            if password == confirm: 
+                #Database Transaction Management
+                try:
+                    db.execute("INSERT INTO person(person_id,first_name,last_name,age,height,weight,email,username,password)VALUES(:person_id,:first_name,:last_name,:age,:height,:weight,:email,:username:password)",
+                            {"person_id":PID,"first_name": firstname, "last_name": lastname, "age":age, "height":height, "weight":weight, "email":email, "username":username, "password": secure_password})
+                    db.commit()
+                    flash("Registration Successful Please login", "success")
+                    return redirect(url_for('login'))
+                except Exception as error:
+                    flash("Failed to update record to database, rollback done, try adding again" "danger")
+                    print("Failed to update record to database, rollback done: {}".format(error))
+                    # reverting changes if exception occurs
+                    db.rollback()
+                finally:
+                    # closing created database object .
+                    if conn:
+                        db.remove()
+            #if password and conform password field doesnt match an error is displayed
+            flash("Password and confirm password do not match","danger")
+            return render_template('register.html', form = userform)
+        #Notify user that username is already taken 
+        flash("Username already taken please select another")
         return render_template('register.html', form = userform)
     #If form validation fails, errors are displayed on form 
     flash_errors(userform)
@@ -82,30 +91,22 @@ def login():
         #Gets data from form
         username = logform.username.data
         password = logform.password.data
-        #seperates username to get ID
-        try:
-            #Handles possible exception from bad username input
-            txt = username.split('_')
-            user= txt[0]
-            userid = int(txt[1])
-        except Exception as error:
-                flash("Incorrect Username Format, try logging in again. Format: FirstName_ID", "danger")
-                return render_template('login.html', form = logform)
         #Creates a database object by binding the connection created earlier at startup
         db = scoped_session(sessionmaker(bind=conn))
         #Querying the server using database object
-        usernamedata = db.execute("SELECT first_name FROM person WHERE person_id=:person_id", {
-                                  "person_id": userid}).fetchone()
-        passworddata = db.execute("SELECT password FROM person WHERE person_id=:person_id", {
-                                  "person_id": userid}).fetchone()
-        useriddata = db.execute("SELECT person_id FROM person WHERE person_id=:person_id", {
-                                  "person_id": userid}).fetchone()
+        usernamedata = db.execute("SELECT username FROM person WHERE username=:username", {
+                                  "username": username}).fetchone()
+        passworddata = db.execute("SELECT password FROM person WHERE password=:password", {
+                                  "password": password}).fetchone()
+        useriddata = db.execute("SELECT person_id FROM person WHERE username=:username", {
+                                  "username": username}).fetchone()
         #Processing results of query
         if usernamedata is None:
             #Informs user no such user exists
             flash("No such user exists", "danger")
             return render_template('login.html', form = logform)
         else:
+            #Queries return a result as a list with index 0 being the actual value
             pw = passworddata[0]
             usr = usernamedata[0]
             usrid = useriddata[0]
@@ -261,10 +262,8 @@ def meal():
         #Gets session data on the current logged in user
         '''username = str(session['username'])'''
         UID = str(session['userid'])
-
-        #Generate mealID and receive date created from Adds Table
+        #Generate mealID 
         MID = genId("meal")
-
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         if UID != None:
@@ -336,7 +335,7 @@ def direction(RID, Inst):
     #Get a specific recipe in the database using the recipe ID that was generated on insertion
     db = scoped_session(sessionmaker(bind=conn))
     instructions = Inst.split(',')
-    dir_no = 1
+    dir_no = genId("direction")
     for ins in instructions:
         try:
             db.execute("INSERT INTO direction(recipe_id,dir_no,detail)VALUES(:recipe_id,:dir_no,:detail)",
