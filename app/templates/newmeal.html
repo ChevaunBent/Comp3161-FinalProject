@@ -6,6 +6,14 @@
         <div class="form-group col-sm-9 pl-0">
             {{ form.name.label }} {{ form.name(class='form-control', placeholder="Enter Meal Title") }}
         </div>
+        <div>
+            <input type="radio" id="select1" name="select1" checked>
+            <label for="select1">Add Random Recipe</label>
+        </div>
+        <div>
+            <input type="radio" id="select2" name="select1">
+            <label for="select2">Select Recipe to add</label>
+        </div>
         <button type="submit" name="submit" class="btn btn-primary ">Add Meal</button>
     </form>
 </div>

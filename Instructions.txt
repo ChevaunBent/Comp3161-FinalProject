@@ -12,9 +12,10 @@ set DATABASE_URL=mysql://username:pasword@host/finalproject
 
 2. Start mysql server;
 
-3. Create a database called finalproject
+3. Create a database called finalproject (The system was designed with 
+the database having this name)
 
-4. Create a virtual environment (python3 -m venv venv)
+4. Create a virtual environment called venv in this directory (python3 -m venv venv)
 
 5. Activate the virtual environment(source venv/bin/activate)
 

@@ -76,7 +76,7 @@ def register():
             flash("Password and confirm password do not match","danger")
             return render_template('register.html', form = userform)
         #Notify user that username is already taken 
-        flash("Username already taken please select another")
+        flash("Username already taken please select another", "danger")
         return render_template('register.html', form = userform)
     #If form validation fails, errors are displayed on form 
     flash_errors(userform)
@@ -257,8 +257,13 @@ def searchrecipe():
             results = list(db.execute("SELECT * from recipe WHERE name=:name LIMIT 0,30", {
                                   "name": filter1}).fetchall())
             return render_template('recipes.html', recipes = results, form = searchform)
+        elif len(filter1) == 0 and filter2 != None:
+            #Query Database using filter1
+            results = list(db.execute("SELECT * from recipe WHERE serving=:serving LIMIT 0,30", {
+                                  "serving": filter2}).fetchall())
+            return render_template('recipes.html', recipes = results, form = searchform)
         elif len(filter1) != 0  and filter2 != None:
-            #Query Database using filter2
+            #Query Database using both filters
             result1 = list(db.execute("SELECT * from recipe WHERE name=:name LIMIT 0,30", {
                                   "name": filter1}).fetchall())
             result2 = list(db.execute("SELECT * from recipe WHERE serving=:serving LIMIT 0,30", {
@@ -273,13 +278,15 @@ def searchrecipe():
     return render_template('recipes.html', form = searchform)
 
 #Route for displaying all meals
-@app.route('/meals/', methods=["GET", "POST"])
-def meals():
+@app.route('/meals/<recipe_id>', methods=["GET", "POST"])
+def meals(recipe_id):
     #Creates a database object by binding the connection created earlier
     db = scoped_session(sessionmaker(bind=conn))
     #Queries the database using database object for all recipes
     res = db.execute("SELECT * FROM meal").fetchall()
-    meals = list(res)
+    res2 = db.execute("SELECT * FROM recipe where recipe_id=:recipe_id in (SELECT recipe_id from prepare)", {
+                                  "recipe_id": recipe_id}).fetchall()
+    meals = list(res) + [list(res2)]
     #Handles our GET request
     if request.method == "GET":
         """Render the website's meals page."""
@@ -290,12 +297,21 @@ def meals():
         response.headers['Content-Type'] = 'application/json'            
         return response
 
+#Route for adding meals
 @app.route('/meal', methods=['POST', 'GET'])
 def meal():
     # Instantiate form class
     mealform = NewMeal()
     #Validates form data
     if request.method == "POST" and mealform.validate_on_submit:
+        if request.form.get('select1'):
+            #Creates a database object by binding the connection created earlier
+            db = scoped_session(sessionmaker(bind=conn))
+            #Getting list of available recipes
+            recipes = list(db.execute("SELECT recipe_id FROM recipe"))
+            #generating random index to use select recipe
+            random_index = random.randint(0,len(recipes)-1)
+            RID = recipes[random_index]
         #Gets data from form
         name = mealform.name.data
         #Gets session data on the current logged in user
@@ -303,14 +319,17 @@ def meal():
         UID = str(session['userid'])
         #Generate mealID 
         MID = genId("meal")
+        #Generate date created
+        date = datetime.date.today()
         #Creates a database object by binding the connection created earlier
         db = scoped_session(sessionmaker(bind=conn))
         if UID != None:
             try:
-                db.execute("INSERT INTO meal(meal_id,name)VALUES(:meal_id,:name)",{"meal_id":MID,"name": name})
+                db.execute("INSERT INTO meal(meal_id,name, date)VALUES(:meal_id,:name,:date)",{"meal_id":MID,"name": name, "date": date})
+                db.execute("INSERT INTO prepare(recipe_id, meal_id)VALUES(:recipe_id,:meal_id)",{"recipe_id":RID[0],"meal_id": MID})
                 db.commit()
                 flash("Meal Added Successfully", "success")
-                return redirect(url_for('meals'))
+                return redirect(url_for('meals', recipe_id = RID[0]))
             except Exception as error:
                 flash("Failed to update record to database, rollback done, try adding again", "danger")
                 print("Failed to update record to database, rollback done: {}".format(error))

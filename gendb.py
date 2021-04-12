@@ -71,6 +71,8 @@ my_db.tables["measurement"].add_column(column_name="abbreviation", data_type="va
 #Generate fake data to add to meal table
 my_db.tables["meal"].add_primary_key(column_name="meal_id")
 my_db.tables["meal"].add_column(column_name="name", data_type="varchar(50)", data_target="job")
+my_db.tables["meal"].add_column(column_name="date", data_type="date", data_target="date_time")
+
 
 #Generate fake data to add to type table
 my_db.tables["type"].add_primary_key(column_name="type_no")
